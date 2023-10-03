@@ -1,7 +1,9 @@
+#!/usr/bin/env node
+
 const readline = require('readline');
 const colors = require('colors');
 const { exec } = require('child_process');
-const package = require('./package.json');
+const package = require('../package.json');
 
 const modules = [
     ...Object?.keys(package?.dependencies || [])?.map(name => ({ name, version: package.dependencies[name].replace('^', ''), dev: false })),
