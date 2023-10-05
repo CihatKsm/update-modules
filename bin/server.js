@@ -3,7 +3,7 @@
 const readline = require('readline');
 const colors = require('colors');
 const { exec } = require('child_process');
-const package = require(__dirname + '/../package.json');
+const package = require(__dirname.split('node_modules')[0].replaceAll(`\\`, '/') + 'package.json');
 
 const modules = [
     ...Object?.keys(package?.dependencies || [])?.map(name => ({ name, version: package.dependencies[name].replace('^', ''), dev: false })),
@@ -53,6 +53,4 @@ const fetchModule = async (name) => {
         exec(`npm install ${moduls}`, (error) => error ? console.error(error) : console.log('● Update completed.'.green));
         client.close();
     });
-})()
-
-console.log(__dirname)
+})();

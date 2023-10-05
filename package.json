@@ -1,6 +1,6 @@
 {
   "name": "update-modules",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "This module is used to update all modules in the project.",
   "main": "bin/server.js",
   "scripts": {
