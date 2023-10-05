@@ -3,7 +3,7 @@
 const readline = require('readline');
 const colors = require('colors');
 const { exec } = require('child_process');
-const package = require('../package.json');
+const package = require(__dirname + '/../package.json');
 
 const modules = [
     ...Object?.keys(package?.dependencies || [])?.map(name => ({ name, version: package.dependencies[name].replace('^', ''), dev: false })),
@@ -54,3 +54,5 @@ const fetchModule = async (name) => {
         client.close();
     });
 })()
+
+console.log(__dirname)
