@@ -1,13 +1,13 @@
 {
   "name": "update-modules",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "This module is used to update all modules in the project.",
-  "main": "bin/server.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node bin/server.js"
+    "start": "node server.js"
   },
   "bin": {
-    "update-modules": "./bin/server.js"
+    "update-modules": "./server.js"
   },
   "author": "CihatKsm <me@cihatksm.com>",
   "license": "MIT",
