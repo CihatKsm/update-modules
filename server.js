@@ -1,20 +1,29 @@
 #!/usr/bin/env node
 
+const dir = __dirname.split('node_modules')[0].replaceAll(`\\`, '/') + '/';
 const readline = require('readline');
-const colors = require('colors');
 const { exec } = require('child_process');
-const package = require(__dirname.split('node_modules')[0].replaceAll(`\\`, '/') + 'package.json');
+const package = require(dir + 'package.json');
+require('colors');
 
 const modules = [
     ...Object?.keys(package?.dependencies || [])?.map(name => ({ name, version: package.dependencies[name].replace('^', ''), dev: false })),
     ...Object?.keys(package?.devDependencies || [])?.map(name => ({ name, version: package.devDependencies[name].replace('^', ''), dev: true })),
 ]
 
-const fetchModule = async (name) => {
+/**
+ * 
+ * @param {*} name This is the module name. 
+ * @returns 
+ */
+const fetchModule = async (name = String) => {
     const res = await fetch(`https://registry.npmjs.org/${name}`);
     return await res.json();
 }
 
+/**
+ * Async function to check for updates.
+ */
 (async () => {
     console.log('● Checking for updates...\n'.white);
 
