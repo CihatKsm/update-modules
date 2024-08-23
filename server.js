@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const debug = process.argv?.pop() == '--debug';
 const log = (text) => console.log('▲ update-modules: '.cyan + text);
 const dir = __dirname.split('node_modules')[0].replaceAll(`\\`, '/') + '/';
