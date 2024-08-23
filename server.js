@@ -53,7 +53,7 @@ const fetchModule = async (name) => await fetch(`https://registry.npmjs.org/${na
     checkingUpdateBar.start(modules?.length || 0, 0);
     checkingUpdateBar.increment();
 
-    const updatebleModules = (await Promise.all(modules.map(async (module, i) => {
+    let updatebleModules = (await Promise.all(modules.map(async (module, i) => {
         checkingUpdateBar.update(i + 1);
         const data = await fetchModule(module.name);
         if (!data) return null;
@@ -84,12 +84,14 @@ const fetchModule = async (name) => await fetch(`https://registry.npmjs.org/${na
         return;
     }
 
+    updatebleModules = updatebleModules.filter(f => f.latest);
+
     log();
     console.log(arrow.cyan);
     console.log(`▲  ${'Module'.padEnd(nameLength)}    ${'Version'.padEnd(versionLength)}    Latest`.cyan);
     console.log(arrow.cyan);
 
-    for (let module of updatebleModules.filter(f => f.latest)) {
+    for (let module of updatebleModules) {
         var name = module.name + ' '.repeat(nameLength - module.name.length);
         var version = module.version + ' '.repeat(versionLength - module.version.length);
         console.log(`▲  ${name}  :  ${version}  →  ${module.latest}`.yellow);
@@ -111,7 +113,7 @@ const fetchModule = async (name) => await fetch(`https://registry.npmjs.org/${na
 
         if (debug) log('Updating the modules...'.blue);
 
-        moduleInstallingBar.start(modules.length, 0);
+        moduleInstallingBar.start(updatebleModules.length, 0);
         moduleInstallingBar.increment();
 
         for (let i = 0; i < updatebleModules.length; i++) {
