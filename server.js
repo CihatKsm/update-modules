@@ -1,7 +1,7 @@
 const log = (text) => console.log('▲ update-modules: '.cyan + text);
 const dir = __dirname.split('node_modules')[0].replaceAll(`\\`, '/') + '/';
 const readline = require('readline');
-const child_process = require('child_process');
+const { exec } = require('child_process');
 const package = require(dir + 'package.json');
 require('colors');
 
@@ -50,7 +50,7 @@ const fetchModule = async (name) => await fetch(`https://registry.npmjs.org/${na
         if (answer.toLowerCase() !== 'yes') return client.close();
         const modules = updatebleModules.map(m => m.name + '@' + m.latest).join(' ');
         log(`ᴄᴍᴅ : npm install ${modules}`.white);
-        child_process.exec(`npm install ${modules}`, (error) => error ? log(error.red) : log('Update completed.'.green));
+        exec(`npm install ${modules}`, (error) => error ? log(error.red) : log('Update completed.'.green));
         client.close();
     });
 
