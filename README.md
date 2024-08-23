@@ -1,21 +1,25 @@
-#### Modül İndirme:
+#### Module Download
 
 ```bash
-  npm install update-modules
+  npm install update-modules@latest
 ```
 
-#### Modul Kullanımı:
+#### Add Script in package.json and Run
+
+```json
+  "scripts": {
+    "update-modules": "update-modules"
+  }
+```
+
 ```bash
-  update-modules
+  npm run update-modules
 ```
 
-#### Lisans
+#### License
+
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 
-#### Geri Bildirim
+#### Feedback
 
-**E-posta:** me@cihatksm.com adresinden bana ulaşın.
-
-#### Bilgi
-<br>
-Herhangi bir sorun teşkil ediyorsa, problem oluşturuyorsa ya da oluşturduysa önce tarafıma bilgi verilmesi rica olunur.
+**E-mail:** me@cihatksm.com
