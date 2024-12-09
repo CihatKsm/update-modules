@@ -45,7 +45,24 @@ if (debug) log(`Modules: ${modules.map(m => `"${m?.name}"`).join(', ')}`.blue);
  * @param {String} name This is the module name. 
  * @returns 
  */
-const fetchModule = async (name) => await fetch(`https://registry.npmjs.org/${name}`).then(res => res.json()).catch(() => null);
+const fetchModule = async (name) => {
+    let output = null;
+    const addresses = [
+        'registry.npmjs.org/{name}', 
+        'cdn.jsdelivr.net/npm/{name}@latest/package.json'
+    ];
+    
+    for (let address of addresses) {
+        try {
+            output = await fetch('https://' + address.replaceAll('{name}', name)).then(res => res?.json());
+            if (output) break;
+        } catch (error) {
+            if (debug) log(`Error: ${error}`.red);
+        }
+    }
+
+    return output;
+}
 
 (async () => {
     log(`Checking the updates of "${_normaly_modules.length}" normal and "${_dev_modules.length}" developer modules.`.yellow);
@@ -58,7 +75,7 @@ const fetchModule = async (name) => await fetch(`https://registry.npmjs.org/${na
         const data = await fetchModule(module.name);
         if (!data) return null;
 
-        const newVersion = data['dist-tags']?.latest;
+        const newVersion = data?.['dist-tags']?.latest || data?.version;
         if (!newVersion) return { ...module, latest: null };
 
         const updateble = newVersion != module.version;
