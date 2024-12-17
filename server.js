@@ -33,6 +33,7 @@ const moduleInstallingBar = new cli_progress.SingleBar({
 
 if (debug) log('Debug mode is enabled.'.blue);
 
+const ignored_modules = package?.['ignored-dependencies'] || [];
 const _normaly_modules = Object?.keys(package?.dependencies || [])?.map(name => ({ name, version: package.dependencies[name].replace('^', ''), dev: false }));
 const _dev_modules = Object?.keys(package?.devDependencies || [])?.map(name => ({ name, version: package.devDependencies[name].replace('^', ''), dev: true }));
 const modules = [..._normaly_modules, ..._dev_modules];
@@ -78,7 +79,7 @@ const fetchModule = async (name) => {
         const newVersion = data?.['dist-tags']?.latest || data?.version;
         if (!newVersion) return { ...module, latest: null };
 
-        const updateble = newVersion != module.version;
+        const updateble = newVersion != module.version && !ignored_modules.includes(module.name);
         if (updateble) return { ...module, latest: newVersion };
         else return null;
     }))).filter(f => f !== null);
