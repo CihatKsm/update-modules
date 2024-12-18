@@ -6,37 +6,39 @@ const debug = process.argv?.pop() == '--debug';
 const log_title = '▲ update-modules: '.cyan;
 const log = (text) => console.log(log_title + (text || ''));
 
-const cli_progress = require('cli-progress');
-const child_process = require('node:child_process');
-const readline = require('readline');
+const { SingleBar, Presets } = require('cli-progress');
+const { exec } = require('node:child_process');
+const { createInterface } = require('readline');
 
 const dir = __dirname.split('node_modules')[0].replaceAll(`\\`, '/') + '/';
 const package = require(dir + 'package.json');
 
-const checkingUpdateBar = new cli_progress.SingleBar({
+const checkingUpdateBar = new SingleBar({
     barCompleteChar: '+',
     barIncompleteChar: '-',
     fps: 1,
     clearOnComplete: false,
     hideCursor: true,
     format: log_title + 'Modules Control: {bar} {value} / {total}'.yellow,
-}, cli_progress.Presets.shades_grey);
+}, Presets.shades_grey);
 
-const moduleInstallingBar = new cli_progress.SingleBar({
+const moduleInstallingBar = new SingleBar({
     barCompleteChar: '+',
     barIncompleteChar: '-',
     fps: 1,
     clearOnComplete: false,
     hideCursor: true,
     format: log_title + 'Modules Install: {bar} {value} / {total}'.yellow,
-}, cli_progress.Presets.shades_grey);
+}, Presets.shades_grey);
 
 if (debug) log('Debug mode is enabled.'.blue);
 
-const ignored_modules = package?.['ignored-dependencies'] || [];
-const _normaly_modules = Object?.keys(package?.dependencies || [])?.map(name => ({ name, version: package.dependencies[name].replace('^', ''), dev: false }));
-const _dev_modules = Object?.keys(package?.devDependencies || [])?.map(name => ({ name, version: package.devDependencies[name].replace('^', ''), dev: true }));
-const modules = [..._normaly_modules, ..._dev_modules];
+const ignored_modules = package?.updateModulesConfig?.ignore || [];
+const dependencies = Object?.keys(package?.dependencies || []);
+const devDependencies = Object?.keys(package?.devDependencies || []);
+const normaly_modules = dependencies?.map(name => ({ name, version: package?.dependencies?.[name]?.replace('^', ''), dev: false }));
+const dev_modules = devDependencies?.map(name => ({ name, version: package?.devDependencies?.[name]?.replace('^', ''), dev: true }));
+const modules = [...normaly_modules, ...dev_modules];
 
 if (debug) log(`Modules: ${modules.map(m => `"${m?.name}"`).join(', ')}`.blue);
 
@@ -49,10 +51,10 @@ if (debug) log(`Modules: ${modules.map(m => `"${m?.name}"`).join(', ')}`.blue);
 const fetchModule = async (name) => {
     let output = null;
     const addresses = [
-        'registry.npmjs.org/{name}', 
+        'registry.npmjs.org/{name}',
         'cdn.jsdelivr.net/npm/{name}@latest/package.json'
     ];
-    
+
     for (let address of addresses) {
         try {
             output = await fetch('https://' + address.replaceAll('{name}', name)).then(res => res?.json());
@@ -66,7 +68,7 @@ const fetchModule = async (name) => {
 }
 
 (async () => {
-    log(`Checking the updates of "${_normaly_modules.length}" normal and "${_dev_modules.length}" developer modules.`.yellow);
+    log(`Checking the updates of "${normaly_modules.length}" normal and "${dev_modules.length}" developer modules.`.yellow);
 
     checkingUpdateBar.start(modules?.length || 0, 0);
     checkingUpdateBar.increment();
@@ -119,7 +121,7 @@ const fetchModule = async (name) => {
 
     if (debug) log('Asking for update confirmation.'.blue);
 
-    const client = readline.createInterface({ input: process.stdin, output: process.stdout });
+    const client = createInterface({ input: process.stdin, output: process.stdout });
     client.question(log_title + 'Do you want to update? (yes / no) \n'.yellow + log_title + 'Your Answer: '.yellow, async (answer) => {
         if (debug) log(`Answer: ${answer}`.blue);
 
@@ -164,25 +166,7 @@ const fetchModule = async (name) => {
  */
 async function moduleUpdate(name, verison) {
     return await new Promise((resolve, reject) => {
-        child_process.exec(`npm install ${name}@${verison}`, (error) => {
-            if (error) {
-                setTimeout(() => reject(error), 200)
-            } else {
-                setTimeout(() => resolve(true), 200)
-            }
-        });
-    });
-}
-
-/**
- * Deletes the module.
- * 
- * @param {String} name This is the module name.
- * @returns 
- */
-async function deleteModule(name) {
-    return await new Promise((resolve, reject) => {
-        child_process.exec(`npm uninstall ${name}`, (error) => {
+        exec(`npm install ${name}@${verison}`, (error) => {
             if (error) {
                 setTimeout(() => reject(error), 200)
             } else {
